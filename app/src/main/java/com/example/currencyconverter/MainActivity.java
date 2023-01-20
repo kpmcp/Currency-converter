@@ -2,22 +2,55 @@ package com.example.currencyconverter;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+
+import android.app.Dialog;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.button.MaterialButton;
 
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
+    public static String url="https://api.apilayer.com/currency_data/convert?";
+    public static final String APIKEY = "h3O80whx4K5nzLKieICyzbZcnNxZDW8N";
+
+
     Boolean isNew = true;
-    String oldNumber;
-    char operator;
     String currentField="field_1";
 
+    String oldNumber, amountToConvert;
+    ArrayList<String> arrayList;
+    char operator;
+
+    String[] countries = {"AED", "AFN", "EUR", "USD", "RUB", "ALL", "AMD", "ANG", "AOA", "ARS", "AUD", "KZT", "SHP", "ZAR", "BRL",
+            "CZK"};
+
+    Dialog fromDialog;
+    Dialog toDialog;
     MediaPlayer sound;
     EditText field_one, field_two;
+    TextView course_field1, course_field2;
 
     MaterialButton delete, delete_all, replace, divide, seven, eight, nine, six, five, four,
             three, two, one, zero, comma, plus, minus, multiply, equals;
@@ -27,9 +60,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        arrayList = new ArrayList<>();
         field_one = findViewById(R.id.field1);
         field_two = findViewById(R.id.field2);
+        course_field1 = findViewById(R.id.course1);
+        course_field2 = findViewById(R.id.course2);
         sound = MediaPlayer.create(this, R.raw.calculator_button_press_single_002_11984);
+
+        for (String country: countries) {
+            arrayList.add(country);
+        }
     }
 
     public void clickNumber(View view) {
@@ -118,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         field.setText(number);
+        sendConvertRequest(course_field2.getText().toString(), course_field1.getText().toString(),  field.getText().toString());
     }
 
     public void Operations(View view) {
@@ -169,21 +210,141 @@ public class MainActivity extends AppCompatActivity {
             newNumber = newNumber.substring(0, newNumber.length() - 1);
         }
         field.setText(newNumber);
+        sendConvertRequest(course_field2.getText().toString(), course_field1.getText().toString(),  field.getText().toString());
     }
 
     public void clickDeleteAll(View view) {
-        EditText field = returnField();
+//        EditText field = returnField();
         sound.start();
-        field.setText("0");
+        field_one.setText("0");
+        field_two.setText("0");
         isNew = true;
     }
 
     public void clickReplace(View view){
         sound.start();
+        String course1 = course_field1.getText().toString();
+        String course2 = course_field2.getText().toString();
+
+        String amount1 = field_one.getText().toString();
+        String amount2 = field_two.getText().toString();
         if (currentField.equals("field_1")){
-            currentField = "field_2";
+            course_field2.setText(course1);
+            course_field1.setText(course2);
+
+            field_two.setText(amount1);
+            field_one.setText(amount2);
         }
-        else currentField = "field_1";
+        else
+            course_field1.setText(course2);
+            course_field2.setText(course1);
+
+            field_one.setText(amount2);
+            field_two.setText(amount1);
+    }
+
+    public void clickFiledOne(View view) {
+//        sendConvertRequest();
+
+        fromDialog = new Dialog(MainActivity.this);
+        fromDialog.setContentView(R.layout.countries);
+        fromDialog.getWindow().setLayout(1000, 1200);
+        fromDialog.show();
+
+        EditText search_text = fromDialog.findViewById(R.id.search_edit_text);
+        ListView list_view = fromDialog.findViewById(R.id.list_view);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, arrayList);
+        list_view.setAdapter(adapter);
+
+        search_text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                adapter.getFilter().filter(charSequence);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                course_field1.setText(adapter.getItem(i));
+                fromDialog.dismiss();
+                amountToConvert = adapter.getItem(i);
+            }
+        });
+    }
+
+    public void clickFiledTwo(View view) {
+
+        toDialog = new Dialog(MainActivity.this);
+        toDialog.setContentView(R.layout.countries);
+        toDialog.getWindow().setLayout(1000, 1200);
+        toDialog.show();
+
+        EditText search_text = toDialog.findViewById(R.id.search_edit_text);
+        ListView list_view = toDialog.findViewById(R.id.list_view);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, arrayList);
+        list_view.setAdapter(adapter);
+
+        search_text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                adapter.getFilter().filter(charSequence);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                course_field2.setText(adapter.getItem(i));
+                toDialog.dismiss();
+                amountToConvert = adapter.getItem(i);
+            }
+        });
+    }
+
+    public void sendConvertRequest(String convertTo, String convertFrom, String amountToConvert){
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url + "to=" + convertTo + "&from=" + convertFrom + "&amount=" + amountToConvert + "&apikey=" + APIKEY, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                JSONObject jsonObject = null;
+                try {
+                    jsonObject = new JSONObject(response);
+                    Double res = Double.valueOf(jsonObject.getString("result"));
+                    field_two.setText(res+"");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        queue.add(stringRequest);
+
     }
 
     private EditText returnField(){

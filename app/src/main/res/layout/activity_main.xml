@@ -146,14 +146,13 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/multiply"
-                android:onClick="Operations"
                 style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
                 android:layout_width="72dp"
                 android:layout_height="72dp"
                 android:layout_margin="12dp"
                 android:backgroundTint="@color/holo_orange_dark"
+                android:onClick="Operations"
                 android:soundEffectsEnabled="true"
-                android:text="/"
                 android:textColor="@color/white"
                 android:textSize="32dp"
                 app:cornerRadius="36dp"

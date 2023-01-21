@@ -22,7 +22,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.material.button.MaterialButton;
 
 
 import org.json.JSONException;
@@ -33,7 +32,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     public static String url="https://api.apilayer.com/currency_data/convert?";
-    public static final String APIKEY = "h3O80whx4K5nzLKieICyzbZcnNxZDW8N";
+    public static final String APIKEY = "lZG8fC5NUTyhcunci1b3RmRzDucdBJ8c";
 
 
     Boolean isNew = true;
@@ -52,9 +51,6 @@ public class MainActivity extends AppCompatActivity {
     EditText field_one, field_two;
     TextView course_field1, course_field2;
 
-    MaterialButton delete, delete_all, replace, divide, seven, eight, nine, six, five, four,
-            three, two, one, zero, comma, plus, minus, multiply, equals;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         field_two = findViewById(R.id.field2);
         course_field1 = findViewById(R.id.course1);
         course_field2 = findViewById(R.id.course2);
-        sound = MediaPlayer.create(this, R.raw.calculator_button_press_single_002_11984);
+        sound = MediaPlayer.create(this, R.raw.single_tap);
 
         for (String country: countries) {
             arrayList.add(country);
@@ -73,9 +69,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clickNumber(View view) {
-//        MaterialButton button = (MaterialButton) view;
-        EditText field = returnField();
         sound.start();
+        EditText field = returnField();
         if (isNew) {
             field.setText("");
         }
@@ -162,8 +157,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void Operations(View view) {
-        EditText field = returnField();
         sound.start();
+        EditText field = returnField();
         isNew = true;
         oldNumber = field.getText().toString();
         switch (view.getId()) {
@@ -199,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
             field.setText(result + "");
+            sendConvertRequest(course_field2.getText().toString(), course_field1.getText().toString(),  field.getText().toString());
         }
     }
 
@@ -214,7 +210,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clickDeleteAll(View view) {
-//        EditText field = returnField();
         sound.start();
         field_one.setText("0");
         field_two.setText("0");
@@ -244,7 +239,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clickFiledOne(View view) {
-//        sendConvertRequest();
 
         fromDialog = new Dialog(MainActivity.this);
         fromDialog.setContentView(R.layout.countries);
@@ -332,6 +326,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     jsonObject = new JSONObject(response);
                     Double res = Double.valueOf(jsonObject.getString("result"));
+                    System.out.println(res);
                     field_two.setText(res+"");
                 } catch (JSONException e) {
                     e.printStackTrace();

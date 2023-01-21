@@ -30,7 +30,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class CurrencyConverter extends AppCompatActivity {
     public static String url="https://api.apilayer.com/currency_data/convert?";
     public static final String APIKEY = "lZG8fC5NUTyhcunci1b3RmRzDucdBJ8c";
 
@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
         Double result = 0.0;
         if (Double.parseDouble(newNumber) < 0.000000001 && operator == '/'
                 || newNumber.equals("") && operator == '/') {
-            Toast.makeText(MainActivity.this, "Нельзя делить на ноль!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(CurrencyConverter.this, "Нельзя делить на ноль!", Toast.LENGTH_SHORT).show();
         }
         else {
             switch (operator) {
@@ -240,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void clickFiledOne(View view) {
 
-        fromDialog = new Dialog(MainActivity.this);
+        fromDialog = new Dialog(CurrencyConverter.this);
         fromDialog.setContentView(R.layout.countries);
         fromDialog.getWindow().setLayout(1000, 1200);
         fromDialog.show();
@@ -248,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
         EditText search_text = fromDialog.findViewById(R.id.search_edit_text);
         ListView list_view = fromDialog.findViewById(R.id.list_view);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, arrayList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(CurrencyConverter.this, android.R.layout.simple_list_item_1, arrayList);
         list_view.setAdapter(adapter);
 
         search_text.addTextChangedListener(new TextWatcher() {
@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void clickFiledTwo(View view) {
 
-        toDialog = new Dialog(MainActivity.this);
+        toDialog = new Dialog(CurrencyConverter.this);
         toDialog.setContentView(R.layout.countries);
         toDialog.getWindow().setLayout(1000, 1200);
         toDialog.show();
@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
         EditText search_text = toDialog.findViewById(R.id.search_edit_text);
         ListView list_view = toDialog.findViewById(R.id.list_view);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, arrayList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(CurrencyConverter.this, android.R.layout.simple_list_item_1, arrayList);
         list_view.setAdapter(adapter);
 
         search_text.addTextChangedListener(new TextWatcher() {
